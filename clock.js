@@ -9,13 +9,13 @@ view.id = "clock";
 view.style.width = view_size + "px";
 view.style.height = view_size + "px";
 view.style.position = "relative";
-// TODO: set all
+view.style.borderRadius = "50%";
+view.style.WebkitBorderRadius = "50%";
+view.style.MozBorderRadius = "50%";
 view.style.borderRadius = "50%";
 view.style.border = view_border_size + "px solid " + view_border_colour;
 view.style.background = "url(" + image + ") no-repeat";
 view.style.backgroundSize = clock_size + "px " + clock_size + "px";
-// TODO: set all
-view.style.webkitTransition = "1s ease";
 
 var hand_size = 2;
 var hand_colour = "red";
@@ -27,7 +27,6 @@ hand.style.position = "absolute";
 hand.style.width = hand_size + "px";
 hand.style.background = hand_colour;
 hand.style.height = view_size + "px";
-hand.style.webkitTransition = "1s ease";
 
 view.appendChild(hand);
 
@@ -35,15 +34,15 @@ document.body.appendChild(view);
 var diameter = clock_size;
 var radius = diameter / 2;
 
-var seconds_to_rads = function (seconds) {
-  return (seconds * ((2 * Math.PI) / 60));
+var milli_seconds_to_rads = function (milli_seconds) {
+  return (milli_seconds * ((2 * Math.PI) / 60000));
 };
 
-var seconds_to_degs = function (seconds) {
-  return (seconds * (360 / 60));
+var milli_seconds_to_degs = function (milli_seconds) {
+  return (milli_seconds * (360 / 60000));
 };
 
-// Convert co-ordinate to parcentage
+// Convert co-ordinate to percentage
 var position = function (coord) {
   if (coord < 0) {
     return (((radius - Math.abs(coord)) / radius) / 2) * 100;
@@ -52,31 +51,30 @@ var position = function (coord) {
   }
 };
 
-var update = function () {
-  var seconds, angle, x, y;
+var alter_view_port = function (milli_seconds) {
+  var angle, x, y;
 
-  seconds = new Date().getSeconds();
-
-  angle = seconds_to_rads(seconds) - (Math.PI / 2);
+  angle = milli_seconds_to_rads(milli_seconds) - (Math.PI / 2);
   x = radius * Math.cos(angle);
   y = radius * Math.sin(angle);
-  view.style.backgroundPosition = position(x) + "% " + position(y) + "%";
 
-  // Rotate hand
-  {
-    var deg = seconds_to_degs(seconds);
-    // Stop full backwards flip of hand
-    if(deg === 0) {
-      hand.style.webkitTransition = "none";
-      hand.style.webkitTransform = "rotate(0deg)";
-      setTimeout(function() {
-        hand.style.webkitTransition = "1s ease";
-      }, 1);
-    } else {
-      hand.style.webkitTransform = "rotate(" + deg + "deg)";
-    }
-  }
+  view.style.backgroundPosition = position(x) + "% " + position(y) + "%";
+};
+
+var rotate_hand = function (milli_seconds) {
+  var deg = milli_seconds_to_degs(milli_seconds);
+  hand.style.webkitTransform = "rotate(" + deg + "deg)";
+};
+
+var update = function () {
+  var date, milli_seconds;
+
+  date = new Date();
+  milli_seconds = date.getMilliseconds() + (date.getSeconds() * 1000);
+
+  alter_view_port(milli_seconds);
+  rotate_hand(milli_seconds);
 };
 
 // Call each second to update
-setInterval(update, 1000);
+setInterval(update, 60);
