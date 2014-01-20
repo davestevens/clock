@@ -36,12 +36,10 @@ document.body.appendChild(view);
 var diameter = clock_size;
 var radius = diameter / 2;
 
-var milli_seconds_to_rads = function (milli_seconds) {
-  return (milli_seconds * ((2 * Math.PI) / 60000));
-};
+var resolution = (12 * 60 * 60);
 
-var milli_seconds_to_degs = function (milli_seconds) {
-  return (milli_seconds * (360 / 60000));
+var time_to_rads = function (time) {
+  return (time * ((2 * Math.PI) / resolution));
 };
 
 // Convert co-ordinate to percentage
@@ -53,30 +51,46 @@ var position = function (coord) {
   }
 };
 
-var alter_view_port = function (milli_seconds) {
-  var angle, x, y;
+var alter_view_port = function (angle) {
+  var x, y;
 
-  angle = milli_seconds_to_rads(milli_seconds) - (Math.PI / 2);
+  angle -= (Math.PI / 2);
   x = radius * Math.cos(angle);
   y = radius * Math.sin(angle);
 
   view.style.backgroundPosition = position(x) + "% " + position(y) + "%";
 };
 
-var rotate_hand = function (milli_seconds) {
-  var deg = milli_seconds_to_degs(milli_seconds);
-  hand.style.webkitTransform = "rotate(" + deg + "deg)";
+var rotate_hand = function (angle) {
+  hand.style.webkitTransform = "rotate(" + angle + "rad)";
+};
+
+var get_time = function () {
+  var date, time;
+
+  date = new Date();
+
+  time = date.getHours();
+  time = (time > 12) ? (time - 12) : time;
+  time = (time === 12) ? 0 : time;
+
+  time *= (60 * 60);
+  time += (date.getMinutes() * 60);
+  time += date.getSeconds();
+
+  return time;
 };
 
 var update = function () {
-  var date, milli_seconds;
+  var time, angle;
 
-  date = new Date();
-  milli_seconds = date.getMilliseconds() + (date.getSeconds() * 1000);
+  time = get_time();
+  angle = time_to_rads(time);
 
-  alter_view_port(milli_seconds);
-  rotate_hand(milli_seconds);
+  alter_view_port(angle);
+  rotate_hand(angle);
+
+  setTimeout(update, 15000);
 };
 
-// Call each second to update
-setInterval(update, 60);
+update();
