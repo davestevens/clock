@@ -14,7 +14,7 @@ view.style.WebkitBorderRadius = "50%";
 view.style.MozBorderRadius = "50%";
 view.style.borderRadius = "50%";
 view.style.border = view_border_size + "px solid " + view_border_colour;
-view.style.background = "url(" + image + ") no-repeat";
+view.style.background = "url(clock.svg) no-repeat";
 view.style.backgroundSize = clock_size + "px " + clock_size + "px";
 
 var hand_size = 2;
