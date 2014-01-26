@@ -8,7 +8,7 @@ Include `clock.js`
 ```
 
 Instantiate (all parameters are optional)
-```javasript
+```javascript
 new Clock({
   el: // HTML#Element to append Clock to (defaults to document.body)
   calculate_angle: // Function to return angle (in radians) based on time
