@@ -1,102 +1,165 @@
-var view_size = 200;
-var clock_size = 800;
+var Clock = (function () {
+  var Clock = function (params) {
+    this.initialize_params(params);
+    this.display();
+    this.animate();
+  };
 
-var view_border_size = 4;
-var view_border_colour = "black";
+  // Create view and append to document
+  Clock.prototype.display = function () {
+    this.create_view();
+    this.create_hand();
 
-var face_image = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" height="400" width="400"><defs><g id="small"><line x1="200" y1="32" x2="200" y2="34" stroke="black" stroke-width="1"/></g><g id="medium"><line x1="200" y1="32" x2="200" y2="38" stroke="black" stroke-width="1"/></g><g id="large"><line x1="200" y1="32" x2="200" y2="46" stroke="black" stroke-width="2"/></g><g id="ticks"><g transform="rotate(5 200 200)"><use xlink:href="#small"/></g><g transform="rotate(10 200 200)"><use xlink:href="#small"/></g><g transform="rotate(15 200 200)"><use xlink:href="#medium"/></g><g transform="rotate(20 200 200)"><use xlink:href="#small"/></g><g transform="rotate(25 200 200)"><use xlink:href="#small"/></g><g transform="rotate(30 200 200)"><use xlink:href="#large"/></g></g></defs><g transform="rotate(0 200 200)"><use xlink:href="#ticks"/></g><g transform="rotate(30 200 200)"><use xlink:href="#ticks"/></g><g transform="rotate(60 200 200)"><use xlink:href="#ticks"/></g><g transform="rotate(90 200 200)"><use xlink:href="#ticks"/></g><g transform="rotate(120 200 200)"><use xlink:href="#ticks"/></g><g transform="rotate(150 200 200)"><use xlink:href="#ticks"/></g><g transform="rotate(180 200 200)"><use xlink:href="#ticks"/></g><g transform="rotate(210 200 200)"><use xlink:href="#ticks"/></g><g transform="rotate(240 200 200)"><use xlink:href="#ticks"/></g><g transform="rotate(270 200 200)"><use xlink:href="#ticks"/></g><g transform="rotate(300 200 200)"><use xlink:href="#ticks"/></g><g transform="rotate(330 200 200)"><use xlink:href="#ticks"/></g></svg>';
+    this.view.appendChild(this.hand);
+    {
+      var parent = this.el || document.body;
+      parent.appendChild(this.view);
+    }
+  };
 
-var view = document.createElement("div");
-view.id = "clock";
-view.style.width = view_size + "px";
-view.style.height = view_size + "px";
-view.style.position = "relative";
-view.style.borderRadius = "50%";
-view.style.WebkitBorderRadius = "50%";
-view.style.MozBorderRadius = "50%";
-view.style.borderRadius = "50%";
-view.style.border = view_border_size + "px solid " + view_border_colour;
-view.style.background = "url('" + face_image + "')";
-view.style.backgroundSize = clock_size + "px " + clock_size + "px";
+  // Animate clock
+  Clock.prototype.animate = function () {
+    var angle = this.calculate_angle();
 
-var hand_size = 2;
-var hand_colour = "red";
+    this.set_view_port(angle);
+    this.rotate_hand(angle);
 
-var hand = document.createElement("hand");
-hand.id = "hand";
-hand.style.left = (view_size / 2) - (hand_size / 2) + "px";
-hand.style.position = "absolute";
-hand.style.width = hand_size + "px";
-hand.style.background = hand_colour;
-hand.style.height = view_size + "px";
+    {
+      var self = this;
+      requestAnimationFrame(function () {
+        self.animate();
+      });
+    }
+  };
 
-view.appendChild(hand);
+  // Create the view element of the Clock display
+  Clock.prototype.create_view = function () {
+    var view = document.createElement("div");
+    view.style.width = this.style.view.size + "px";
+    view.style.height = this.style.view.size + "px";
+    view.style.position = "relative";
+    view.style.borderRadius = "50%";
+    view.style.WebkitBorderRadius = "50%";
+    view.style.MozBorderRadius = "50%";
+    view.style.borderRadius = "50%";
+    view.style.border = this.style.view.border.size + "px solid " +
+      this.style.view.border.color;
+    view.style.background = "url('" + this.style.clock.image + "')";
+    view.style.backgroundSize = this.style.clock.size + "px " +
+      this.style.clock.size + "px";
 
-document.body.appendChild(view);
-var diameter = clock_size;
-var radius = diameter / 2;
+    return this.view = view;
+  };
 
-var resolution = (12 * 60 * 60);
+  // Create the hand element of the Clock display
+  Clock.prototype.create_hand = function () {
+    var hand = document.createElement("div");
+    hand.style.left = (this.style.view.size / 2) -
+      (this.style.hand.size / 2) + "px";
+    hand.style.position = "absolute";
+    hand.style.width = this.style.hand.size + "px";
+    hand.style.background = this.style.hand.color;
+    hand.style.height = this.style.view.size + "px";
 
-var time_to_rads = function (time) {
-  return (time * ((2 * Math.PI) / resolution));
-};
+    return this.hand = hand;
+  };
 
-// Convert co-ordinate to percentage
-var position = function (coord) {
-  if (coord < 0) {
-    return (((radius - Math.abs(coord)) / radius) / 2) * 100;
-  } else {
-    return (((coord / radius) / 2) + 0.5) * 100;
-  }
-};
+  // Return the time which is then used with the resolution to define positon of
+  // the clock
+  Clock.prototype.time = function () {
+    var date, time;
 
-var alter_view_port = function (angle) {
-  var x, y;
+    date = new Date();
 
-  angle -= (Math.PI / 2);
-  x = radius * Math.cos(angle);
-  y = radius * Math.sin(angle);
+    time = date.getHours();
+    time = (time > 12) ? (time - 12) : time;
+    time = (time === 12) ? 0 : time;
 
-  view.style.backgroundPosition = position(x) + "% " + position(y) + "%";
-};
+    time *= (60 * 60);
+    time += (date.getMinutes() * 60);
+    time += date.getSeconds();
 
-var rotate_hand = function (angle) {
-  hand.style.webkitTransform = "rotate(" + angle + "rad)";
-};
+    return time;
+  };
 
-var get_time = function () {
-  var date, time;
+  Clock.prototype.calculate_angle = function () {
+    return (this.time() * ((2 * Math.PI) / (12 * 60 * 60)));
+  };
 
-  date = new Date();
+  // Convert point on outer circle of clock face to percentage for positioning
+  // background image
+  Clock.prototype.position = function (coord) {
+    var radius = this.style.clock.size / 2;
 
-  time = date.getHours();
-  time = (time > 12) ? (time - 12) : time;
-  time = (time === 12) ? 0 : time;
+    if (coord < 0) {
+      return (((radius - Math.abs(coord)) / radius) / 2) * 100;
+    } else {
+      return (((coord / radius) / 2) + 0.5) * 100;
+    }
+  };
 
-  time *= (60 * 60);
-  time += (date.getMinutes() * 60);
-  time += date.getSeconds();
+  // Set background position of clock face
+  Clock.prototype.set_view_port = function (angle) {
+    var x, y, radius;
 
-  return time;
-};
+    radius = this.style.clock.size / 2;
+    angle -= (Math.PI / 2);
+    x = radius * Math.cos(angle);
+    y = radius * Math.sin(angle);
 
-var update = function () {
-  var time, angle;
+    this.view.style.backgroundPosition = this.position(x) + "% " +
+      this.position(y) + "%";
+  };
 
-  time = get_time();
-  angle = time_to_rads(time);
+  // Set rotation of clock hand
+  Clock.prototype.rotate_hand = function (angle) {
+    this.hand.style.webkitTransform = "rotate(" + angle + "rad)";
+  };
 
-  alter_view_port(angle);
-  rotate_hand(angle);
+  Clock.prototype.initialize_params = function (params) {
+    this.params = params.merge(default_params);
+    this.style = {}.merge(this.params.style);
 
-  animate(update);
-};
+    this.calculate_angle = this.params.calculate_angle || this.calculate_angle
+  };
 
-var animate = window.requestAnimationFrame || window.mozRequestAnimationFrame ||
-  window.webkitRequestAnimationFrame || window.msRequestAnimationFrame ||
-  function (func) {
+  // Default Params for creating clock (Override from constructor)
+  var default_params = {
+    style: {
+      view: {
+        size: 200,
+        border: {
+          size: 4,
+          color: "black"
+        }
+      },
+      hand: {
+        size: 2,
+        color: "red"
+      },
+      clock: {
+        size: 800,
+        image: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" height="400" width="400"><defs><g id="small"><line x1="200" y1="32" x2="200" y2="34" stroke="black" stroke-width="1"/></g><g id="medium"><line x1="200" y1="32" x2="200" y2="38" stroke="black" stroke-width="1"/></g><g id="large"><line x1="200" y1="32" x2="200" y2="46" stroke="black" stroke-width="2"/></g><g id="ticks"><g transform="rotate(5 200 200)"><use xlink:href="#small"/></g><g transform="rotate(10 200 200)"><use xlink:href="#small"/></g><g transform="rotate(15 200 200)"><use xlink:href="#medium"/></g><g transform="rotate(20 200 200)"><use xlink:href="#small"/></g><g transform="rotate(25 200 200)"><use xlink:href="#small"/></g><g transform="rotate(30 200 200)"><use xlink:href="#large"/></g></g></defs><g transform="rotate(0 200 200)"><use xlink:href="#ticks"/></g><g transform="rotate(30 200 200)"><use xlink:href="#ticks"/></g><g transform="rotate(60 200 200)"><use xlink:href="#ticks"/></g><g transform="rotate(90 200 200)"><use xlink:href="#ticks"/></g><g transform="rotate(120 200 200)"><use xlink:href="#ticks"/></g><g transform="rotate(150 200 200)"><use xlink:href="#ticks"/></g><g transform="rotate(180 200 200)"><use xlink:href="#ticks"/></g><g transform="rotate(210 200 200)"><use xlink:href="#ticks"/></g><g transform="rotate(240 200 200)"><use xlink:href="#ticks"/></g><g transform="rotate(270 200 200)"><use xlink:href="#ticks"/></g><g transform="rotate(300 200 200)"><use xlink:href="#ticks"/></g><g transform="rotate(330 200 200)"><use xlink:href="#ticks"/></g></svg>'
+      }
+    }
+  };
+
+  return Clock;
+})();
+
+var requestAnimationFrame = window.requestAnimationFrame ||
+  window.mozRequestAnimationFrame || window.webkitRequestAnimationFrame ||
+  window.msRequestAnimationFrame || function (func) {
     setTimeout(func, 1000);
   };
 
-animate(update);
+Object.prototype.merge = function (x) {
+  for (i in x) {
+    if (typeof(x[i]) === "object" && this[i]) {
+      this[i] = this[i].merge(x[i]) || x[i];
+    } else {
+      this[i] = this[i] || x[i];
+    }
+  }
+  return this;
+};
