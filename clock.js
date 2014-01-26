@@ -90,7 +90,13 @@ var update = function () {
   alter_view_port(angle);
   rotate_hand(angle);
 
-  setTimeout(update, 15000);
+  animate(update);
 };
 
-update();
+var animate = window.requestAnimationFrame || window.mozRequestAnimationFrame ||
+  window.webkitRequestAnimationFrame || window.msRequestAnimationFrame ||
+  function (func) {
+    setTimeout(func, 1000);
+  };
+
+animate(update);
