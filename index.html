@@ -1,52 +1,147 @@
 <!DOCTYPE html>
 <html>
   <head>
+    <link href="clock.css" media="all" rel="stylesheet" type="text/css" />
     <script src="clock.js"></script>
   </head>
   <body>
-    <script>
-      // Default, appended to document.body
-      new Clock();
+    <div class="container">
+      <h1>Clock</h1>
 
-      // Append to provided element
-      var clock_container = document.createElement("div");
-      clock_container.id = "clock_container";
-      document.body.appendChild(clock_container);
-      new Clock({
-        el: clock_container
-      });
+      <a href="https://github.com/davestevens/Clock"><img style="position: absolute; top: 0; right: 0; border: 0;" src="https://s3.amazonaws.com/github/ribbons/forkme_right_red_aa0000.png" alt="Fork me on GitHub"></a>
 
-      // Configure clock display
-      var seconds_clock = function () {
-        var date, time;
-        date = new Date();
-        time = date.getMilliseconds() + (date.getSeconds() * 1000);
-        return (time * ((2 * Math.PI) / (60 * 1000)));
-      };
-      new Clock({
-        calculate_angle: seconds_clock
-      });
+      <p>Inspired by this gif (see on <a href="http://redd.it/1vib88">Reddit</a>):</p>
+      <img src="http://i.imgur.com/Bf4C7nZ.gif"/>
 
-      // Configure style
-      new Clock({
-        style: {
-          view: {
-            size: 150,
-            border: {
-              size: 2
-            }
-          },
-          hand: {
-            size: 4,
-            color: "rgba(255, 0, 255, 0.5)"
-          },
-          clock: {
-            size: 400,
-            image: "http://oclockpress.com/files/clocktemplate.gif"
-          }
-        },
-        calculate_angle: seconds_clock
-      });
-    </script>
+      <hr/>
+
+      <div class="example_container">
+        <h2>Example 1</h2>
+        <p>Create a default Clock.<br>
+          Displays current time, (hours, minutes and seconds).<br>
+          Defaults to appending to 'document.body', pass '{ el: HTML#element }' to append to specific element in the page.
+        </p>
+
+        <div class="code">
+          <h3>Code:</h3>
+          <pre>new Clock();</pre>
+        </div>
+
+        <div class="example">
+          <h3>Example:</h3>
+          <div id="example"></div>
+          <script>
+            new Clock({el: document.getElementById("example")});
+          </script>
+        </div>
+      </div>
+
+      <hr/>
+
+      <div class="example_container">
+        <h2>Example 2</h2>
+        <p>Customize time display.<br>
+          Passing a custom function for 'calculate_example' allows you to override the timing.<br>
+          This example uses Seconds and Milliseconds to calculate the hand position.
+        </p>
+
+        <div class="code">
+          <h3>Code:</h3>
+          <pre>// Configure clock display
+var minute_clock = function () {
+  var date, time;
+  date = new Date();
+  time = date.getMilliseconds() + (date.getSeconds() * 1000);
+  return (time * ((2 * Math.PI) / (60 * 1000)));
+};
+
+new Clock({
+  calculate_angle: minute_clock
+});</pre>
+        </div>
+
+        <div class="example">
+          <h3>Example:</h3>
+          <div id="example_minute"></div>
+          <script>
+            var example_minute = document.getElementById("example_minute");
+            var minute_clock = function () {
+              var date, time;
+              date = new Date();
+              time = date.getMilliseconds() + (date.getSeconds() * 1000);
+              return (time * ((2 * Math.PI) / (60 * 1000)));
+            };
+
+            new Clock({
+              el: example_minute,
+              calculate_angle: minute_clock
+            });
+          </script>
+        </div>
+      </div>
+
+      <hr/>
+
+      <div class="example_container">
+        <h2>Example 3</h2>
+        <p>Use custom styling/sizes</p>
+
+        <div class="code">
+          <h3>Code:</h3>
+          <pre>new Clock({
+  style: {
+    view: {
+      size: 150,
+      border: {
+        size: 2
+      }
+    },
+    hand: {
+      size: 4,
+      color: "rgba(255, 0, 255, 0.5)"
+    },
+    clock: {
+      size: 400,
+      image: "//oclockpress.com/files/clocktemplate.gif"
+    }
+  }
+});</pre>
+        </div>
+
+        <div class="example">
+          <h3>Example:</h3>
+          <div id="example_style"></div>
+          <script>
+            var example = document.getElementById("example_style");
+            var seconds_clock = function () {
+              var date, time;
+              date = new Date();
+              time = date.getMilliseconds() + (date.getSeconds() * 1000);
+              return (time * ((2 * Math.PI) / (60 * 1000)));
+            };
+            new Clock({
+              el: example_style,
+              calculate_angle: seconds_clock,
+              style: {
+                view: {
+                  size: 150,
+                  border: {
+                    size: 2
+                  }
+                },
+                hand: {
+                  size: 4,
+                  color: "rgba(255, 0, 255, 0.5)"
+                },
+                clock: {
+                  size: 400,
+                  image: "//oclockpress.com/files/clocktemplate.gif"
+                }
+              }
+            });
+          </script>
+        </div>
+      </div>
+    </div>
   </body>
 </html>

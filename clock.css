@@ -1,0 +1,29 @@
+html, body {
+  padding: 0;
+  margin: 0;
+}
+
+.container {
+  width: 800px;
+  margin: 0 auto;
+}
+
+.example_container {
+  display: inline-block;
+}
+
+.code {
+  width: 500px;
+  float: left;
+}
+
+.example {
+  width: 280px;
+  float: left;
+  padding-left: 20px;
+}
+
+pre {
+  border: 1px solid black;
+  padding: 10px;
+}
