@@ -31,3 +31,8 @@ new Clock({
   }
 });
 ```
+
+## Examples
+See examples:
+
+http://davestevens.github.io/clock/
