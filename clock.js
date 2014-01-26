@@ -1,6 +1,6 @@
 var Clock = (function () {
   var Clock = function (params) {
-    this.initialize_params(params);
+    this.initialize_params(params || {});
     this.display();
     this.animate();
   };
