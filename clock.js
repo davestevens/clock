@@ -12,7 +12,7 @@ var Clock = (function () {
 
     this.view.appendChild(this.hand);
     {
-      var parent = this.el || document.body;
+      var parent = this.params.el || document.body;
       parent.appendChild(this.view);
     }
   };
