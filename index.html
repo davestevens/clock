@@ -3,12 +3,50 @@
   <head>
     <script src="clock.js"></script>
   </head>
-
   <body>
-    <div id="clock_container"></div>
-
     <script>
+      // Default, appended to document.body
       new Clock();
+
+      // Append to provided element
+      var clock_container = document.createElement("div");
+      clock_container.id = "clock_container";
+      document.body.appendChild(clock_container);
+      new Clock({
+        el: clock_container
+      });
+
+      // Configure clock display
+      var seconds_clock = function () {
+        var date, time;
+        date = new Date();
+        time = date.getMilliseconds() + (date.getSeconds() * 1000);
+        return (time * ((2 * Math.PI) / (60 * 1000)));
+      };
+      new Clock({
+        calculate_angle: seconds_clock
+      });
+
+      // Configure style
+      new Clock({
+        style: {
+          view: {
+            size: 150,
+            border: {
+              size: 2
+            }
+          },
+          hand: {
+            size: 4,
+            color: "rgba(255, 0, 255, 0.5)"
+          },
+          clock: {
+            size: 400,
+            image: "http://oclockpress.com/files/clocktemplate.gif"
+          }
+        },
+        calculate_angle: seconds_clock
+      });
     </script>
   </body>
 </html>
